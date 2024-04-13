@@ -2,7 +2,7 @@ const express = require('express');
 const { MongoClient } = require('mongodb');
 const cors=require('cors')
 // MongoDB connection URI
-const uri = "mongodb+srv://shreyanshgupta1234545:1yM8hw0hFYkM5QjK@unistud.5lxafrc.mongodb.net/Unistud?retryWrites=true&w=majority&appName=Unistud";
+const uri = "mongodb+srv://shreyanshgupta1234545:1yM8hw0hFYkM5QjK@unistud.5lxafrc.mongodb.net/?retryWrites=true&w=majority&appName=Unistud";
 
 // Create a new Express application
 const app = express();
