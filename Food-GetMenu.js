@@ -43,7 +43,7 @@ app.get('/menu-items', async (req, res) => {
         res.status(500).json({ error: "Failed to fetch menu items" });
     }
 });
-app.post('/menu-items', async (req, res) => {
+app.post('/add_menu-items', async (req, res) => {
     try {
         const newItem = req.body; // Assuming the request body contains the new menu item details
         const client = await MongoClient.connect(mongoURL, {
