@@ -1,9 +1,5 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
-
-// Rest of your code remains the same
-
-
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -37,7 +33,6 @@ async function fetchMenuItems() {
         throw err;
     }
 }
-
 // Express endpoint to fetch menu items
 app.get('/menu-items', async (req, res) => {
     try {
@@ -48,7 +43,22 @@ app.get('/menu-items', async (req, res) => {
         res.status(500).json({ error: "Failed to fetch menu items" });
     }
 });
-
+app.post('/menu-items', async (req, res) => {
+    try {
+        const newItem = req.body; // Assuming the request body contains the new menu item details
+        const client = await MongoClient.connect(mongoURL, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        const coll = client.db('Food').collection('GetMenu');
+        await coll.insertOne(newItem);
+        await client.close();
+        res.status(201).json({ message: 'Menu item added successfully' });
+    } catch (error) {
+        console.error("Failed to add menu item:", error);
+        res.status(500).json({ error: "Failed to add menu item" });
+    }
+});
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
