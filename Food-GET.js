@@ -1,5 +1,6 @@
 import express from 'express';
 import { MongoClient } from 'mongodb';
+// const bodyParser = require('body-parser');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -33,7 +34,7 @@ async function fetchMenuItems() {
         throw err;
     }
 }
-// Express endpoint to fetch menu items
+
 app.get('/menu-items', async (req, res) => {
     try {
         const menuItems = await fetchMenuItems();
@@ -43,22 +44,56 @@ app.get('/menu-items', async (req, res) => {
         res.status(500).json({ error: "Failed to fetch menu items" });
     }
 });
-app.post('/add_menu-items', async (req, res) => {
+
+// app.use(bodyParser.json());
+
+app.post('/menu-items', async (req, res) => {
     try {
-        const newItem = req.body; // Assuming the request body contains the new menu item details
-        const client = await MongoClient.connect(mongoURL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        const coll = client.db('Food').collection('GetMenu');
-        await coll.insertOne(newItem);
+        console.log("Received request body:", req.body);
+
+        const newItem = req.body;
+
+        if (!newItem) {
+            return res.status(400).json({ error: "Missing required data: newItem" });
+        }
+
+        delete newItem._id;
+
+        const client = await MongoClient.connect(mongoURL);
+        const db = client.db();
+        const collection = db.collection('GetMenu');
+        const result = await collection.insertOne(newItem);
         await client.close();
-        res.status(201).json({ message: 'Menu item added successfully' });
+        res.status(201).json({ message: 'Menu item added successfully', insertedId: result.insertedId });
     } catch (error) {
         console.error("Failed to add menu item:", error);
-        res.status(500).json({ error: "Failed to add menu item" });
+        res.status(500).json({ error: "Failed to add menu item", details: error });
     }
 });
+
+
+
+// app.post('/menu-items', async (req, res) => {
+//     try {
+//       const newMenuItem = {  // Your specific data object
+//         "name": "Gobhi",
+//         "type": "Vegetable",
+//         "price": 15
+//       };
+  
+//       const client = await MongoClient.connect(mongoURL);
+//       const db = client.db();
+//       const collection = db.collection('GetMenu');
+//       const result = await collection.insertOne(newMenuItem);
+//       await client.close();
+//       res.status(201).json({ message: 'Menu item added successfully', insertedId: result.insertedId });
+//     } catch (error) {
+//       console.error("Failed to add menu item:", error);
+//       res.status(500).json({ error: "Failed to add menu item", details: error });
+//     }
+//   });
+
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
